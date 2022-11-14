@@ -4,15 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.10.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongoose": "^6.7.0",
+    "nodemailer": "^6.8.0",
     "nodemon": "^2.0.20"
   }
 }

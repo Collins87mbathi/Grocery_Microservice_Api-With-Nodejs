@@ -8,8 +8,6 @@ const amqp = require("amqplib");
 let cart ;
 let channel; 
 let connection;
-let order;
-
 // RabbitMQ connection
 async function connectToRabbitMQ() {
     const amqpServer = "amqp://guest:guest@localhost:5672";
@@ -23,13 +21,14 @@ async function connectToRabbitMQ() {
 router.post('/upload',upload,UploadController);
 router.post('/',ProductController.createProduct);
 router.get('/:id',ProductController.getProduct);
-router.put('/:id',ProductController.updateProduct);
+// router.put('/:id',ProductController.updateProduct);
 router.get('/',ProductController.getProducts);
 router.delete('/:id',ProductController.deleteProduct);
 router.put('/cart',verifyUser, async (req, res) => {
     const { ids } = req.body;
     // Get products from database with the given ids
     const products = await Product.findOne({ _id:  ids  });
+   
     // Send to RabbitMQnpm npm 
     channel.sendToQueue(
       "cart-service-queue",
@@ -55,28 +54,5 @@ router.put('/cart',verifyUser, async (req, res) => {
   
   
   } );
-
-router.post('/order', async (req,res,next) => {
-    try {
-        const { ids } = req.body;
-        const products = await Product.find({ _id: { $in: ids } });
-        channel.sendToQueue(
-            "ORDER",
-            Buffer.from(
-                JSON.stringify({
-                    products,
-                    userId: req.user.id,
-                })
-            )
-        );
-        channel.consume("PRODUCT", (data) => {
-            order = JSON.parse(data.content);
-        });
-        return res.json(order);
-    } catch (error) {
-       next(ApiError.InternalServerError(error)); 
-    }
-});
-
 
 module.exports = router;

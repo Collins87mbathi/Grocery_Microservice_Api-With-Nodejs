@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
+orderId: {
+ type:String
+},  
 userId: {
     type:String
 },
@@ -8,18 +11,28 @@ amount : {
   type:String
 },
 date: {type: Date, default: Date.now()},
-items: [
-    {   
-        product: {
-            _id: { type: String, require: true},
-            title:{ type: String },
-            desc: { type: String },
-            img:  { type: String },
-            price:{ type: String },
+products: [
+        {   
+          _id: { type: String, require: true},
+          title: { type: String, require:true},
+          desc: { type: String, require:true},
+          category: { type: String, require:true},
+          img: { type: Object,require:true},
+          qty: { type: Number,require:true},
+          price: { type: Number,require:true},
+          total: {type:Number, require:true}
         }, 
-    }
-]
-});
+],
+paymentMethod: {
+   type: String
+},
+isDelivered: {
+  type:Boolean,
+  default :false
+}
+},
+{timestamps:true}
+);
 
 
 module.exports = mongoose.model("Order",OrderSchema);

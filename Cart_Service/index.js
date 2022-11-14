@@ -4,6 +4,7 @@ const app = express();
 const CONNECTDB =require("./database/connect");
 const ErrorHandler = require("../Errorhandler/ErrorHandler");
 const Cart = require("./models/Cart");
+const CartRoute = require("../Cart_Service/router/Cart");
 const amqp = require("amqplib");
 const PORT = process.env.PORT || 5001;
 let channel;
@@ -12,6 +13,8 @@ let connection;
 //database
 CONNECTDB(process.env.MONGO_DB);
 
+//middlewares
+app.use(express.json());
 
 // RabbitMQ connection
 async function connectToRabbitMQ() {
@@ -20,44 +23,46 @@ async function connectToRabbitMQ() {
     channel = await connection.createChannel();
     await channel.assertQueue("cart-service-queue");
   }
-  
-  createCart = async(products, userId,qty) => {
+   //cart logic
+  const createCart = async(products, userId,qty,total) => {
     const cart = await Cart.findOne({ userId: userId })
     const { _id } = products;
     if(cart){
         let isExist = false;
-        let cartItems = cart.products;
+        let cartItems = cart.products;   
         if(cartItems.length > 0){
 
             cartItems.map(item => {                       
-                if(item.product._id === _id){
-                      item.qty = 2;
+                if(item._id === _id){
+                     item.qty = item.qty + 1
                      isExist = true;
-                }
+                     total += item.price* item.qty + 1
+                } 
             });
         } 
-        
         if(!isExist){
-            cartItems.push({product:products });
+            cartItems.push({...products,qty:qty,total:total});
         }
-        
         cart.products = cartItems;
-
-        return await cart.save();
-      
+      return  await cart.save();
     }else{
        return await Cart.create({
             userId,
-            products:[{product:products }]
+            products:[{...products,qty:qty,total:total}],
+            
         })
     }
+    
   };
-  
+
+  //connecting to rabbitmq
   connectToRabbitMQ().then(() => { 
     channel.consume("cart-service-queue", (data) => {
       // order service queue listens to this queue
       const { products,userId,qty } = JSON.parse(data.content);
-      const newCart = createCart(products,userId,qty);
+      let total = products.price * qty;
+    
+      const newCart = createCart(products,userId,qty,total);
       channel.ack(data);
       channel.sendToQueue(
         "product-service-queue",
@@ -66,20 +71,9 @@ async function connectToRabbitMQ() {
     });
   });
 
-
-
-
-  app.get('/cart/:id',async (req,res)=>{
-    
-    try {
-        const cart = await Cart.findOne({userId:req.params.id});
-        res.status(200).json(cart);   
-    } catch (error) {
-       console.log(error); 
-    }
-    
-  })
-
+//routers
+app.use('/api',CartRoute);
+  
 //errorHandler
 app.use(ErrorHandler);
 

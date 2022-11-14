@@ -6,16 +6,16 @@ const CartSchema = new mongoose.Schema({
  },
  products: [
     {
-        product: {
             _id: { type: String, require: true},
-            name: { type: String, require:true},
-            photo: { type: Object,require:true},
+            title: { type: String, require:true},
+            desc: { type: String, require:true},
+            category: { type: String, require:true},
+            img: { type: Object,require:true},
             qty: { type: Number,require:true},
-            price: { type: Number,require:true}, 
-        }
+            price: { type: Number,require:true},
+            total: {type:Number, require:true} 
     }
- ]
-
-});
+ ],
+},{timestamps:true});
 
 module.exports = mongoose.model('Cart', CartSchema);

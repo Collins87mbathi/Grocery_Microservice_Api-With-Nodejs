@@ -26,24 +26,15 @@ const userSchema = new mongoose.Schema({
  }],
  cart: [
    {
-     product: { 
-           _id: { type: String, require: true},
-           name: { type: String},
-           photo: { type: Object},
-           quantity: { type: Number},
-           price: { type: Number},
-       },
-   }
-],
-wishlist:[
-   {
-       _id: { type: String, require: true },
-       name: { type: String },
-       description: { type: String },
-       banner: { type: String },
-       avalable: { type: Boolean },
-       price: { type: Number },
-   }
+      _id: { type: String, require: true},
+      title: { type: String, require:true},
+      desc: { type: String, require:true},
+      category: { type: String, require:true},
+      img: { type: Object,require:true},
+      qty: { type: Number,require:true},
+      price: { type: Number,require:true},
+      total: {type:Number, require:true} 
+},
 ],
 orders: [
    {
