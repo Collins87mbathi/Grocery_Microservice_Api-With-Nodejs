@@ -11,6 +11,14 @@ const getOrders = async (req,res,next) => {
    next(ApiError.InternalServerError(error)) 
  }
 };
+const updateorderpayment = async (req,res,next) => {
+    try {
+        await Order.updateOne({ _id: req.params.id }, { isPaid: true });
+        res.status(200).json("order updated"); 
+    } catch (error) {
+        next(ApiError.InternalServerError(error));
+    } 
+}
 const updateOrders = async (req,res,next) => {
     try {
         await Order.updateOne({ _id: req.params.id }, { isDelivered: true });
@@ -23,7 +31,7 @@ const updateOrders = async (req,res,next) => {
 const deleteOrders = async (req,res,next) => {
     try {
         await Order.findByIdAndDelete(req.params.id);
-        res.status(200).json("order updated");
+        res.status(200).json("deleted order");
     } catch (error) {
       next(ApiError.InternalServerError(error));  
     }
@@ -38,4 +46,4 @@ const deleteManyOrders = async (req,res,next) => {
     }
 }
 
-module.exports = {getOrders,updateOrders,deleteOrders,deleteManyOrders};
+module.exports = {getOrders,updateOrders,deleteOrders,deleteManyOrders,updateorderpayment};

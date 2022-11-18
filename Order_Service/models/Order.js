@@ -29,6 +29,13 @@ paymentMethod: {
 isDelivered: {
   type:Boolean,
   default :false
+},
+isPaid: {
+  type:Boolean,
+  default :false
+},
+number: {
+  type:String
 }
 },
 {timestamps:true}

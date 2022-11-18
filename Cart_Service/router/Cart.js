@@ -11,6 +11,7 @@ let products
 let amount = 0;
 let orderId = uuidv4();
 let paymentMethod;
+let number;
 
 // RabbitMQ connection
 async function connectToRabbitMQ() {
@@ -27,15 +28,13 @@ router.put('/cart/:id',verifyToken,deleteCartOne);
 router.delete('/cart',verifyToken,deleteCart);
 router.post('/cart/buy',verifyToken, async (req, res) => {
    paymentMethod = req.body.paymentMethod;
+   number = req.body.number;
     // Get cart products from database with the given userId
     const carts = await Cart.findOne({ userId:  req.user.id });
-    products = carts.products;
-    
+    products = carts.products;    
     products.forEach((item) => {
         amount += item.total;
     });
-   
-    console.log(amount);
     // Send to RabbitMQnpm npm 
     channel.sendToQueue(
       "order-service-queue",
@@ -45,7 +44,8 @@ router.post('/cart/buy',verifyToken, async (req, res) => {
           products,
           userId:req.user.id,
           amount,
-          paymentMethod
+          paymentMethod,
+          number
         })
       )
     );
@@ -59,6 +59,6 @@ router.post('/cart/buy',verifyToken, async (req, res) => {
       message: "Order placed successfully",
       order
     });
-  } );
+  });
 
 module.exports = router;
