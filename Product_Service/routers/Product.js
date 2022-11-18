@@ -40,7 +40,6 @@ router.put('/cart',verifyUser, async (req, res) => {
         })
       )
     );
-  
     // Consume from RabbitMQ
     channel.consume("product-service-queue", (data) => {
       console.log("Consumed from product-service-queue");
