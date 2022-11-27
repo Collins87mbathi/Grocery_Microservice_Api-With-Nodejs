@@ -71,7 +71,7 @@ connectToRabbitMQ().then(() => {
     });
   });
 
-//error handler
+//error handlers
 app.use(ErrorHandler);
 
 //listen to the port 
