@@ -73,7 +73,8 @@ connectToRabbitMQ().then(() => {
 
 //error handler
 app.use(ErrorHandler);
-//listen
+
+//listen to the port 
 app.listen(PORT, ()=> {
     console.log(`listening to port ${PORT}`);
 })
