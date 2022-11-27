@@ -52,7 +52,7 @@ if(user){
 }
 
 
-//routes
+//routes - endpoints
 app.use('/api/user',UserRoute);
 
 //connecting to rabbitmq
